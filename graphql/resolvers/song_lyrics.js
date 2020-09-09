@@ -5,7 +5,7 @@ const Song = require("../../models/song");
 const Lyric = require("../../models/lyric");
 // const auth = require("../../util/auth");
 
-const SONG_ADDED = "POST_ADDED";
+const SONG_ADDED = "SONG_ADDED";
 module.exports = {
   Query: {
     songs: async () => await Song.find({}).sort({ createdAt: "desc" }),
