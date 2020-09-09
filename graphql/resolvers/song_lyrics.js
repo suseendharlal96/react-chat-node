@@ -1,9 +1,4 @@
-const {
-  UserInputError,
-  AuthenticationError,
-  PubSub,
-} = require("apollo-server");
-const pubsub = new PubSub();
+const { UserInputError, AuthenticationError } = require("apollo-server");
 
 const User = require("../../models/user");
 const Song = require("../../models/song");
@@ -18,7 +13,7 @@ module.exports = {
     song: async (_, { id }) => await Song.findById(id),
   },
   Mutation: {
-    addSong: async (_, { title }, { loggedUser }) => {
+    addSong: async (_, { title }, { loggedUser, pubSub }) => {
       // const loggedUser = auth(context);
       if (!loggedUser) {
         throw new AuthenticationError("Unauthenticated");
@@ -31,7 +26,7 @@ module.exports = {
       });
       const result = await song.save();
       console.log(result);
-      pubsub.publish(SONG_ADDED, { songAdded: result });
+      pubSub.publish(SONG_ADDED, { songAdded: result });
       return result;
     },
     addLyricToSong: async (_, { content, songId }, { loggedUser }) => {
@@ -99,7 +94,7 @@ module.exports = {
   },
   Subscription: {
     songAdded: {
-      subscribe: () => pubsub.asyncIterator([SONG_ADDED]),
+      subscribe: (_, _, { pubSub }) => pubSub.asyncIterator([SONG_ADDED]),
     },
   },
   SongType: {

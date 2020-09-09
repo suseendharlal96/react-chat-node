@@ -2,12 +2,10 @@
 const { UserInputError, AuthenticationError } = require("apollo-server");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-// const { createWriteStream, mkdir } = require("fs");
 
 // local imports
 const User = require("../../models/user");
 const Message = require("../../models/message");
-// const File = require("../../models/file");
 const {
   validateSigninInput,
   validateSignupInput,
