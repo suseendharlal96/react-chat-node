@@ -1,10 +1,14 @@
-const { UserInputError, PubSub } = require("apollo-server");
+const {
+  UserInputError,
+  AuthenticationError,
+  PubSub,
+} = require("apollo-server");
 const pubsub = new PubSub();
 
 const User = require("../../models/user");
 const Song = require("../../models/song");
 const Lyric = require("../../models/lyric");
-const auth = require("../../util/auth");
+// const auth = require("../../util/auth");
 
 const SONG_ADDED = "POST_ADDED";
 module.exports = {
@@ -14,8 +18,11 @@ module.exports = {
     song: async (_, { id }) => await Song.findById(id),
   },
   Mutation: {
-    addSong: async (_, { title }, context) => {
-      const loggedUser = auth(context);
+    addSong: async (_, { title }, { loggedUser }) => {
+      // const loggedUser = auth(context);
+      if (!loggedUser) {
+        throw new AuthenticationError("Unauthenticated");
+      }
       const user = await User.findById(loggedUser.id);
       const song = new Song({
         user,
@@ -27,8 +34,11 @@ module.exports = {
       pubsub.publish(SONG_ADDED, { songAdded: result });
       return result;
     },
-    addLyricToSong: async (_, { content, songId }, context) => {
-      const loggedUser = auth(context);
+    addLyricToSong: async (_, { content, songId }, { loggedUser }) => {
+      // const loggedUser = auth(context);
+      if (!loggedUser) {
+        throw new AuthenticationError("Unauthenticated");
+      }
       const user = await User.findById(loggedUser.id);
       const song = await Song.findById(songId);
       if (!song) {
@@ -47,8 +57,11 @@ module.exports = {
       console.log("r", result);
       return result;
     },
-    deleteSong: async (_, { songId }, context) => {
-      const loggedUser = auth(context);
+    deleteSong: async (_, { songId }, { loggedUser }) => {
+      // const loggedUser = auth(context);
+      if (!loggedUser) {
+        throw new AuthenticationError("Unauthenticated");
+      }
       const user = await User.findById(loggedUser.id);
       const song = await Song.findById(songId);
       if (!song) {
@@ -65,8 +78,11 @@ module.exports = {
 
       return "deleted successfully";
     },
-    likeLyric: async (_, { lyricId }, context) => {
-      const loggedUser = auth(context);
+    likeLyric: async (_, { lyricId }, { loggedUser }) => {
+      // const loggedUser = auth(context);
+      if (!loggedUser) {
+        throw new AuthenticationError("Unauthenticated");
+      }
       console.log("l", loggedUser);
       const lyric = await Lyric.findById(lyricId);
       console.log(lyric);

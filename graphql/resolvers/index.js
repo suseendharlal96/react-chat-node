@@ -32,5 +32,6 @@ module.exports = {
   },
   Subscription: {
     ...songlyricResolver.Subscription,
+    ...messageResolver.Subscription,
   },
 };

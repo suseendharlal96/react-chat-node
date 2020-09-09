@@ -76,5 +76,6 @@ module.exports = gql`
 
   type Subscription {
     songAdded: SongType!
+    messageSent: Message!
   }
 `;

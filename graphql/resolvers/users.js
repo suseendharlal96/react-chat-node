@@ -1,16 +1,18 @@
 // global imports
+const { UserInputError, AuthenticationError } = require("apollo-server");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const { UserInputError } = require("apollo-server");
+const { createWriteStream, mkdir } = require("fs");
 
 // local imports
 const User = require("../../models/user");
 const Message = require("../../models/message");
+const File = require("../../models/file");
 const {
   validateSigninInput,
   validateSignupInput,
 } = require("../../util/validation");
-const auth = require("../../util/auth");
+// const auth = require("../../util/auth");
 const { SECRET_KEY } = require("../../config");
 
 const generateToken = (user) => {
@@ -25,6 +27,24 @@ const generateToken = (user) => {
   );
 };
 
+const storeUpload = async ({ stream, filename, mimetype }) => {
+  const id = new Date().toISOString();
+  const path = `./images/${id}-${filename}`;
+  return new Promise((resolve, reject) =>
+    stream
+      .pipe(createWriteStream(path))
+      .on("finish", () => resolve({ id, path, filename, mimetype }))
+      .on("error", reject)
+  );
+};
+
+const processUpload = async (upload) => {
+  const { createReadStream, filename, mimetype } = await upload;
+  const stream = createReadStream();
+  const file = await storeUpload({ stream, filename, mimetype });
+  return file;
+};
+
 const myusers = [{ username: "sus" }, { username: "sug" }];
 
 const company = [
@@ -34,9 +54,12 @@ const company = [
 ];
 module.exports = {
   Query: {
-    getUsers: async (_, __, context) => {
+    getUsers: async (_, __, { loggedUser }) => {
       try {
-        const loggedUser = auth(context);
+        if (!loggedUser) {
+          throw new AuthenticationError("Unauthenticated");
+        }
+        // const loggedUser = auth(context);
         let otherUsers = await User.find({ email: { $ne: loggedUser.email } });
         const loggedUserMessages = await Message.find({
           $or: [
@@ -93,6 +116,9 @@ module.exports = {
     },
     getMyUser: (_, { username }) => {
       return myusers.find((u) => u.username === username);
+    },
+    files: async () => {
+      return await File.find();
     },
   },
   MyUser: {
@@ -170,6 +196,16 @@ module.exports = {
       const result = await newUser.save();
       const token = generateToken(result);
       return { ...result._doc, id: result.id, token };
+    },
+    uploadFile: async (_, { file }) => {
+      console.log(file);
+      mkdir("./images", { recursive: true }, (err) => {
+        if (err) throw err;
+      });
+      const upload = await processUpload(file);
+      // save our file to the mongodb
+      await File.create(upload);
+      return upload;
     },
   },
 };
