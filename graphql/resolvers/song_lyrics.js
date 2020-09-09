@@ -26,7 +26,7 @@ module.exports = {
       });
       const result = await song.save();
       console.log(result);
-      pubSub.publish(SONG_ADDED, { songAdded: result });
+      // pubSub.publish(SONG_ADDED, { songAdded: result });
       return result;
     },
     addLyricToSong: async (_, { content, songId }, { loggedUser }) => {
@@ -92,11 +92,11 @@ module.exports = {
       return await lyric.save();
     },
   },
-  Subscription: {
-    songAdded: {
-      subscribe: (_, _, { pubSub }) => pubSub.asyncIterator([SONG_ADDED]),
-    },
-  },
+  // Subscription: {
+  //   songAdded: {
+  //     subscribe: (_, _, { pubSub }) => pubSub.asyncIterator([SONG_ADDED]),
+  //   },
+  // },
   SongType: {
     lyrics: async (parent, args) => {
       console.log(parent.lyrics);
