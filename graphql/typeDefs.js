@@ -15,6 +15,14 @@ module.exports = gql`
     to: String!
     from: String!
     createdAt: String!
+    reactions: [Reaction]!
+  }
+  type Reaction {
+    content: String!
+    uuid: String!
+    message: Message!
+    createdAt: String!
+    user: User!
   }
   type MyUser {
     username: String!
@@ -81,10 +89,12 @@ module.exports = gql`
     likeLyric(lyricId: ID!): LyricType!
     deleteSong(songId: ID!): String!
     uploadFile(file: Upload!): File
+    reactToMessage(uuid: String!, content: String!): Reaction!
   }
 
   type Subscription {
     songAdded: SongType!
     messageSent: Message!
+    reacted: Reaction!
   }
 `;
