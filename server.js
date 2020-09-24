@@ -1,5 +1,6 @@
-const { ApolloServer } = require("apollo-server");
+const { ApolloServer } = require("apollo-server-express");
 const mongoose = require("mongoose");
+const express = require("express");
 
 const typeDefs = require("./graphql/typeDefs");
 const resolvers = require("./graphql/resolvers");
@@ -14,17 +15,17 @@ const server = new ApolloServer({
   context: auth,
 });
 
-// server.listen().then(({ url }) => {
-//   console.log("running at " + url);
-// });
+const app = express();
+server.applyMiddleware({ app });
+app.use(express.static("public"));
 
 mongoose
   .connect(MONGODB, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    return server.listen({ port: PORT });
+    return app.listen({ port: PORT });
   })
-  .then((res) => {
-    console.log("running on", res.url);
+  .then(() => {
+    console.log("running");
   })
   .catch((err) => {
     console.log(err);
