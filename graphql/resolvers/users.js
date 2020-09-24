@@ -149,7 +149,7 @@ module.exports = {
   Mutation: {
     signup: async (
       _,
-      { signupInput: { username, email, password, confirmPassword } }
+      { signupInput: { username, email, password, confirmPassword, imageUrl } }
     ) => {
       const { errors, isValid } = validateSignupInput(
         username,

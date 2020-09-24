@@ -45,6 +45,7 @@ module.exports = gql`
     email: String!
     password: String!
     confirmPassword: String!
+    imageUrl:String!
   }
 
   type SongType {
