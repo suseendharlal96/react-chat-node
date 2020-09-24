@@ -1,5 +1,6 @@
 const { ApolloServer } = require("apollo-server-express");
 const mongoose = require("mongoose");
+const cors = require("cors");
 const express = require("express");
 
 const typeDefs = require("./graphql/typeDefs");
@@ -16,6 +17,7 @@ const server = new ApolloServer({
 });
 
 const app = express();
+app.use(cors());
 server.applyMiddleware({ app });
 app.use(express.static("public"));
 
