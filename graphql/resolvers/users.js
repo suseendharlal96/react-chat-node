@@ -201,14 +201,7 @@ module.exports = {
         __dirname,
         `../../public/images/${randomName}`
       );
-      await User.update(
-        { username: username },
-        {
-          $set: {
-            imageUrl: `https://react-graphqlnode-chat.herokuapp.com/images/${randomName}`,
-          },
-        }
-      );
+
       // if (!user) {
       //   throw new AuthenticationError("Unauthenticated");
       // }
@@ -219,6 +212,14 @@ module.exports = {
       // user.imageUrl = `https://react-graphqlnode-chat.herokuapp.com/images/${randomName}`;
       // await user.sa;
       await stream.pipe(fs.createWriteStream(pathname));
+      await User.update(
+        { username: username },
+        {
+          $set: {
+            imageUrl: `https://react-graphqlnode-chat.herokuapp.com/images/${randomName}`,
+          },
+        }
+      );
       return `https://react-graphqlnode-chat.herokuapp.com/images/${randomName}`;
     },
   },
